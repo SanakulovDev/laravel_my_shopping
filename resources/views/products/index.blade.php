@@ -11,14 +11,14 @@
     <div class="bg-white p-4 mb-4 rounded shadow">
         <form action="{{ route('products.index') }}" method="GET" class="flex flex-wrap gap-2">
             <div class="flex-1 min-w-[200px]">
-                <input type="text" name="search" placeholder="Search products..." class="w-full p-2 border rounded" value="{{ request('search') }}">
+                <input type="text" name="search" placeholder="Search products..." class="w-full p-2 border rounded" value="{{ $search ?? request('search') }}">
             </div>
             <div class="w-auto">
-                <select name="category" class="p-2 border rounded w-full">
+                <select name="category_id" class="p-2 border rounded w-full select2">
                     <option value="">All Categories</option>
-                    @foreach(\App\Models\Category::all() as $category)
-                        <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
-                            {{ $category->name }}
+                    @foreach($categories as $cat)
+                        <option value="{{ $cat->id }}" {{ $category == $cat->id ? 'selected' : '' }}>
+                            {{ $cat->name }}
                         </option>
                     @endforeach
                 </select>
@@ -42,6 +42,9 @@
                 <th class="py-2 px-4 border-b">No</th>
                 <th class="py-2 px-4 border-b">Category</th>
                 <th class="py-2 px-4 border-b">Name</th>
+                <th class="py-2 px-4 border-b">Price</th>
+                {{-- photo --}}
+                <th class="py-2 px-4 border-b">Photo</th>
                 <th class="py-2 px-4 border-b">Details</th>
                 <th class="py-2 px-4 border-b text-right">Action</th>
             </tr>
@@ -52,6 +55,15 @@
                 <td class="py-2 px-4 border-b">{{ ++$i }}</td>
                 <td class="py-2 px-4 border-b">{{ $product->category?->name }}</td>
                 <td class="py-2 px-4 border-b">{{ $product->name }}</td>
+                <td class="py-2 px-4 border-b">{{ $product->price }} $</td>
+                {{-- photo --}}
+                <td class="py-2 px-4 border-b">
+                    @if($product->photo && Storage::disk('public')->exists($product->photo))
+                        <img src="{{ Storage::url($product->photo) }}" alt="{{ $product->name }}" class="w-10 h-10 object-cover rounded-full">
+                    @else
+                        <img src="https://ui-avatars.com/api/?name={{ urlencode($product->name) }}&color=7F9CF5&background=EBF4FF" alt="{{ $product->name }}" class="w-10 h-10 object-cover rounded-full">
+                    @endif
+                </td>
                 <td class="py-2 px-4 border-b">{{ $product->detail }}</td>
                 <td class="py-2 px-4 border-b text-right">
                     <form action="{{ route('products.destroy',$product->id) }}" method="POST" class="inline-block">
@@ -78,3 +90,21 @@
     </div>
 </div>
 @endsection
+
+@push('styles')
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+@endpush
+
+@push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.select2').select2({
+                placeholder: 'Select a category',
+                allowClear: true,
+                width: '100%'
+            });
+        });
+    </script>
+@endpush

@@ -5,19 +5,46 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Http\Requests\Product\ProductStoreRequest;
+use App\Models\Category;
+use SebastianBergmann\CodeCoverage\Report\Xml\Totals;
 
 class ProductController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * Display a listing of the resource with pagination.
+     * Display a listing of the resource with pagination and search functionality.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::paginate(10);
+        $query = Product::query();
+        
+        // Search by name or detail
+        $search = $request->get('search') ?? '';
+        $category = $request->get('category_id') ?? '';
+        
+        if (!empty($search)) {
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'LIKE', '%' . $search . '%')
+                  ->orWhere('detail', 'LIKE', '%' . $search . '%');
+            });
+        }
+        
+        // Filter by category
+        if (!empty($category)) {
+            $query->where('category_id', $category);
+        }
+        
+        // Sort by
+        $sortField = $request->get('sort', 'created_at');
+        $sortDirection = $request->get('direction', 'desc');
+        $query->orderBy($sortField, $sortDirection);
+        
+        $products = $query->paginate(10)->withQueryString();
         $i = 0;
-        return view('products.index', compact('products', 'i'));
+        $categories = Category::all();
+        
+        return view('products.index', compact('products', 'i', 'categories', 'search', 'category'));
     }
     
 
