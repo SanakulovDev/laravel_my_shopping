@@ -6,7 +6,6 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Http\Requests\Product\ProductStoreRequest;
 use App\Models\Category;
-use SebastianBergmann\CodeCoverage\Report\Xml\Totals;
 
 class ProductController extends Controller
 {
@@ -48,13 +47,6 @@ class ProductController extends Controller
     }
     
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return view('products.create');
-    }
 
 
     /**
@@ -62,7 +54,7 @@ class ProductController extends Controller
      */
     public function store(ProductStoreRequest $request)
     {
-        // Validated data is automatically available
+        // Create the product (without photo handling)
         $product = Product::create($request->validated());
         
         return redirect()->route('products.index')

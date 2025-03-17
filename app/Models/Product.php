@@ -18,7 +18,8 @@ class Product extends Model
         'detail',
         'price',
         'photo',
-        'category_id'
+        'category_id',
+        'product_type_id'
     ];
 
     /**
