@@ -63,18 +63,24 @@ class ProductController extends Controller
 
     /**
      * Display the specified resource.
+     * param slug
      */
-    public function show(Product $product)
+    public function show(string $slug)
     {
+        $product = Product::where('slug', $slug)->firstOrFail();
         return view('products.show', compact('product'));
     }
 
     /**
      * Show the form for editing the specified resource.
+     * param slug
      */
-    public function edit(Product $product)
+
+    public function edit(string  $slug)
     {
-        return view('products.edit', compact('product'));
+        $product = Product::where('slug', $slug)->firstOrFail();
+        $categories = Category::all();
+        return view('products.edit', compact('product', 'categories'));
     }
 
     /**
@@ -82,7 +88,21 @@ class ProductController extends Controller
      */
     public function update(ProductStoreRequest $request, Product $product)
     {
-        $product->update($request->validated());
+        $validated = $request->validated();
+        
+        // Handle photo upload if provided
+        if ($request->hasFile('photo')) {
+            // Store the new photo
+            $photoPath = $request->file('photo')->store('products', 'public');
+            $validated['photo'] = $photoPath;
+            
+            // Delete old photo if exists
+            if ($product->photo && file_exists(storage_path('app/public/' . $product->photo))) {
+                unlink(storage_path('app/public/' . $product->photo));
+            }
+        }
+        
+        $product->update($validated);
         
         return redirect()->route('products.index')
             ->with('success', 'Product updated successfully');
@@ -91,8 +111,16 @@ class ProductController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Product $product)
+    public function destroy(string $slug)
     {
-        //
+        $product = Product::where('slug', $slug)->firstOrFail();
+        // delete photo
+        if ($product->photo && file_exists(storage_path('app/public/' . $product->photo))) {
+            unlink(storage_path('app/public/' . $product->photo));
+        }
+        $product->delete();
+        return redirect()->route('products.index')
+            ->with('success', 'Product deleted successfully');
+
     }
 }

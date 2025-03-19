@@ -20,6 +20,7 @@ class Product extends Model
         'photo',
         'category_id',
         'count',
+        'slug',
     ];
 
     /**

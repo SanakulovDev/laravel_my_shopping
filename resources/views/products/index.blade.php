@@ -43,6 +43,7 @@
                 <th class="py-2 px-4 border-b">Category</th>
                 <th class="py-2 px-4 border-b">Name</th>
                 <th class="py-2 px-4 border-b">Price</th>
+                <th class="py-2 px-4 border-b">Count</th>
                 {{-- photo --}}
                 <th class="py-2 px-4 border-b">Photo</th>
                 <th class="py-2 px-4 border-b">Details</th>
@@ -56,21 +57,22 @@
                 <td class="py-2 px-4 border-b">{{ $product->category?->name }}</td>
                 <td class="py-2 px-4 border-b">{{ $product->name }}</td>
                 <td class="py-2 px-4 border-b">{{ $product->price }} $</td>
+                <td class="py-2 px-4 border-b">{{ $product->count }}</td>
                 {{-- photo --}}
                 <td class="py-2 px-4 border-b">
-                    @if($product->photo && Storage::disk('public')->exists($product->photo))
-                        <img src="{{ Storage::url($product->photo) }}" alt="{{ $product->name }}" class="w-10 h-10 object-cover rounded-full">
+                    @if($product->photo && file_exists(public_path('storage/' . str_replace('public/', '', $product->photo))))
+                        <img src="{{ asset('storage/' . str_replace('public/', '', $product->photo)) }}" alt="{{ $product->name }}" class="w-10 h-10 object-cover rounded-full">
                     @else
                         <img src="https://ui-avatars.com/api/?name={{ urlencode($product->name) }}&color=7F9CF5&background=EBF4FF" alt="{{ $product->name }}" class="w-10 h-10 object-cover rounded-full">
                     @endif
                 </td>
                 <td class="py-2 px-4 border-b">{{ $product->detail }}</td>
                 <td class="py-2 px-4 border-b text-right">
-                    <form action="{{ route('products.destroy',$product->id) }}" method="POST" class="inline-block">
-                        <a href="{{ route('products.show',$product->id) }}" class="btn btn-info btn-sm">
+                    <form action="{{ route('products.destroy',$product->slug) }}" method="POST" class="inline-block">
+                        <a href="{{ route('products.show',$product->slug) }}" class="btn btn-info btn-sm">
                             <i class="fa fa-eye"></i>
                         </a>
-                        <a href="{{ route('products.edit',$product->id) }}" class="btn btn-primary btn-sm">
+                        <a href="{{ route('products.edit',$product->slug) }}" class="btn btn-primary btn-sm">
                             <i class="fa fa-edit"></i>
                         </a>
                         @csrf

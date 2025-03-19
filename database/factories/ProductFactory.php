@@ -28,6 +28,7 @@ class ProductFactory extends Factory
             'price' => $this->faker->randomFloat(2, 10, 1000),
             'count' => $this->faker->numberBetween(1, 100),
             'photo' => $this->faker->imageUrl(640, 480),
+            'slug' => $this->faker->slug(),
             'category_id' => Category::exists() ? Category::inRandomOrder()->first()->id : null,
         ];
     }
