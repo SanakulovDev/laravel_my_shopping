@@ -1,4 +1,3 @@
-
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -13,8 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('products', function (Blueprint $table) {
-            $table->decimal('price', 10, 2)->after('detail')->default(0.00);
-            $table->string('image')->after('price')->nullable();
+            $table->integer('count')->default(0)->after('price');
         });
     }
 
@@ -24,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('products', function (Blueprint $table) {
-            $table->dropColumn(['price', 'image']);
+            $table->dropColumn('count');
         });
     }
 };
